@@ -202,10 +202,15 @@ dir_lname='Allen'));
  
 # Populating the data of the tables of each Schema:
 -This was done using the Java file/package called MP2DataGenerator and it contains 4 classes, named Schema1, Schema2, Schema3, Schema4 respectively.
+
 -Schema1 java class was used to populate Schema 1 tables.
+
 -Schema2 java class was used to populate Schema 2 tables.
+
 -Schema3 java class was used to populate Schema 4 tables.
+
 -Schema4 java class was used to populate Schema 4 tables.
+
 -In order to link Eclipse with pgAdmin, we had the library called "postgresql-jdbc.jar" which helped us transform the data generated from executing the java classes to the tables of each Schema.
 
 
@@ -227,6 +232,8 @@ In order to run the java file:
 2. Right Click on the project name, choose build path 
 3. Click on the add external archives option 
 4. Browse for "postgresql-jdbc.jar ", which is inside the project folder "MP2DataGenerator" 
+
+
 Note: Make sure to have only one jdbc driver imported. There is already one imported in 
 the project provided to you. You will need to edit the path to that or remove it and add 
 your own. You can do that in Eclipse IDE from Build Path -> Configure Build Path... 

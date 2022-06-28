@@ -2,7 +2,7 @@
 Analyzing and writing efficient SQL queries in terms of cost and execution time which includes the use of different indices and investigating the performance. Populating the tables of the Schemas using Java and optimizing SQL queries using PostgreSQL (pgAdmin 4 v6).
 
 * We have in here 4 Schemas, Each one is a separate schema/database.
-* After each schema, there are one or more SQL statements. In total there are 12 queries you are going to optimize.
+* After each schema, there are one or more SQL statements. In total there are 12 queries for optimization.
 
 # The Schemas:
 

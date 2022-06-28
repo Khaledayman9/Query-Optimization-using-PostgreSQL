@@ -186,7 +186,7 @@ dir_lname='Allen'));
 
 
 
-* For each Query, We used these indices to check whether it will enhance the performances or not:
+-For each Query, We used these indices to check whether it will enhance the performances or not:
  
  1- Query without an index.
  

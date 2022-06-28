@@ -200,7 +200,7 @@ dir_lname='Allen'));
  5- Query with mixed indices (any mix of indices).
  
  
--Some Flags that were used during the optimizing process in was:
+-Some Flags that were used during the optimizing process which was:
 
 1- set enable_seqscan to off;
 
@@ -212,14 +212,14 @@ dir_lname='Allen'));
 
 
 
--We used 2 commands to analyze each Query in terms of cost and performance:
+-We used 2 commands to analyze each Query in terms of cost and performance and other metrices:
 
 1- explain analyze;
 
 2- explain (FORMAT JSON);
 
 
--The performance of each Query was related to the execution time and cost of each one, however we prioritized the cost over execution time in our optimization process.
+-We chose the cost and execution time as our performance metrices, however we prioritized the cost over execution time in our optimization process.
 
  
 # Populating the data of the tables of each Schema:

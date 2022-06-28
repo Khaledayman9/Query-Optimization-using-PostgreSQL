@@ -7,16 +7,26 @@ Analyzing and writing efficient SQL queries in terms of cost and execution time 
 # The Schemas:
 
 * Schema 1:
+
 ![Schema 1](https://user-images.githubusercontent.com/105018459/176202995-14647a64-a8d8-4606-a494-941ee735f9e8.PNG)
 
+
+
 * Schema 2:
+
 ![Schema 2](https://user-images.githubusercontent.com/105018459/176203113-73713a97-fedc-46ac-8ac4-bd155179eecd.PNG)
 
+
 * Schema 3:
+
 ![Schema 3](https://user-images.githubusercontent.com/105018459/176203161-1e8aed4e-228e-4a9d-8516-c9ac344b0304.PNG)
 
+
 * Schema 4:
+
 ![Schema 4](https://user-images.githubusercontent.com/105018459/176203210-a24bf990-1c91-4074-a18f-a1f05d9c7c9c.PNG)
+
+
 
 
 # The Queries are:
@@ -178,15 +188,15 @@ dir_lname='Allen'));
 
 * For each Query, We used these indices to check whether it will enhance the performances or not:
  
- - Query without an index.
+ 1- Query without an index.
  
- - Query with B+ trees indices only.
+ 2- Query with B+ trees indices only.
  
- - Query with hash indices only.
+ 3- Query with hash indices only.
  
- - Query with BRIN indices only.
+ 4- Query with BRIN indices only.
  
- - Query with mixed indices (any mix of indices).
+ 5- Query with mixed indices (any mix of indices).
  
  
  

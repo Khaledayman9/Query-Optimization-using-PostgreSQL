@@ -212,7 +212,9 @@ dir_lname='Allen'));
 # Technologies
 
 Java SE: 1.8
+
 Eclipse IDE
+
 pgAdmin 4 v6
 
 postgresql-jdbc.jar Library

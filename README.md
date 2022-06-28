@@ -177,11 +177,11 @@ dir_lname='Allen'));
 
 
 * For each Query, We used these indices to check whether it will enhance the performances or not:
- 1- Query without an index.
- 2- Query with B+ trees indices only.
- 3- Query with hash indices only.
- 4- Query with BRIN indices only.
- 5- Query with mixed indices (any mix of indices).
+ * Query without an index.
+ * Query with B+ trees indices only.
+ * Query with hash indices only.
+ * Query with BRIN indices only.
+ * Query with mixed indices (any mix of indices).
  
  
  

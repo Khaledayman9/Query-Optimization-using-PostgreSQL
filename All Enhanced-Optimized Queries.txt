@@ -1,0 +1,212 @@
+                               **Enhanced Queries** (Note we wrote the reason why the enhanced queries performs better in each query section)
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**(QUERY 1)
+
+--For Q1, we made a view for , the point of views is that instead of re-evaluating the query over and over again for each row from the outer query, we execute them only once and thus, we check the result set directly without having to re-evaluate the query again.
+
+select *
+from (select *
+create materialized view takesAndSection1 as 
+select t.student_id, t.section_id, t.grade, s.semester, s.year, s.instructor_id, s.course_id, s.classroom_building, s.classroom_room_no
+from takes t inner join section s
+on t.section_id = s.section_id where semester = 1
+and
+year = 2019
+
+
+select *
+from (select *
+from student
+where
+department = 'CSEN') as CS1_student full outer join takesAndSection1 as sem1_student
+on CS1_student.id = sem1_student.student_id;
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**(QUERY 2)
+
+--For Q2, we made a view for employee one ID to get it faster as well as the point of views is that instead of re-evaluating the query over and over again for each row from the outer query, we execute them only once and thus, we check the result set directly without having to re-evaluate the query again,
+--more over using UNION is better than using ORing as we are not multi checking two conditions for each row, also we made inner join instead of cross product then selecting as it will result in processing less rows ( as in cross product we will find all combinations and then check the condition we are selecting by ),
+--also more importantly there was a missing condition which is (p.dnumber = e.dno ), so we added it as well in the query to get the correct results. As the original one was always retrieving the whole project table as it was making a cross product with project table on no condition.
+
+create materialized view employeeOne
+AS
+select * from employee  where lname = 'employee1'
+
+select distinct nn
+from (
+		select p.pnumber as nn from (department d Inner join (select * from employeeOne) e on d.dnumber = e.dno and d.mgr_snn = e.ssn) 
+	    										  Inner join project p on p.dnumber = e.dno
+) as s
+UNION 
+		select w.pno as nn from works_on w inner join (select * from employeeOne)  e on w.essn = e.ssn
+;
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**(QUERY 3)
+
+--For Q3, The point is that we don't need to check all salaries in department 5, we can only check the maximum, also when we group by dno it will be faster to find the maximum from a smaller range ( those only in department 5 ) and more importantly, indexes improve the performance of aggregate functions.
+
+select *
+from employee
+where salary > (select max(salary) from employee group by dno having dno = 5)
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**(QUERY 4)
+
+--For Q4, In the original query, we have inner query and it contains "in", this means that it performs the "from" first where it get the first table completely and then in the "where" we pass in every row in the first table and evaluates the inner query every time on each new row of first table until it is exhausted ,
+--and this seems expensive this is why in the optimized query we joined both tables on the conditions of equal names, sex and ssn which make the number of rows we process less and the join is execute only onces and not repeated like we said about the "IN" subquery.
+
+select e.fname,e.lname 
+from employee e , dependent d
+where e.fname = d.dependent_name
+and e.sex = d.sex
+and e.ssn = d.essn 
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**(QUERY 5)     " Note: not optimized (alternative with the same cost), details in the report " 
+
+--For Q5, it didn’t have an optimized query so we only found an alternative that works with the same cost. Because, anyway we have to join the two tables (employees and dependents) so no matter what we try it always had the same cost even with using views As views were going to join them as well anyway. 
+--Checking it by “IN” in case of views didn’t make a difference as well as we pass on each row from employee anyway. To use exists mean we can’t use views, and we had to do an inner join as well in the subquery so all of them had the same cost. So, we found an alternative query with the same cost as the original one.
+
+select distinct fname, lname
+from employee e,dependent d
+where e.ssn = d.essn; 
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**(QUERY 6)
+
+--For Q6, the most important thing is we didn't need the table "DEPARTMENT" so I removed it from the query, 
+--we made inner join between the table employee and employee again instead of cross product then selecting as it will result in processing less rows ( as in cross product we will find all combinations and then check the condition we are selecting by ). 
+--We could have made a view for departments who got more than 5 employees but we tried to avoid views as much as possible.
+
+
+select s1.dno, count(*)
+from (select dno
+	  from employee e
+       where e.salary > 40000) s1 inner join (  select dno
+												from employee e
+												group by e.dno 
+												having count(*) > 5) s2
+		on s1.dno = s2.dno 
+		group by s1.dno
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**(QUERY 7)
+
+--For Q7, we have inner query and it contains "in", this means that it performs the "from" first where it get the first table completely and then in the
+--"where" we pass in every row in the first table "sailors" and evaluates the inner query every time on each new row of first table "sailors" until it is exhausted and this seems expensive
+--this is why we created the view so that we have that the data of the inner sub query available in order to use it in a condition instead of re-evaluating the inner query every time
+--which seems ineffecient.
+
+create materialized view optReservesView as
+select r.sid from reserves r where r.bid = 103;
+
+select s.sname
+from sailors s
+where
+s.sid in (select * from optReservesView);
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**(QUERY 8)
+
+--For Q8, we have inner query and it contains "in", this means that it performs the "from" first where it get the first table completely and then in the
+--"where" we pass in every row in the first table "sailors" and evaluates the inner query every time on each new row of first table "sailors" until it is exhausted and this seems expensive
+--this is why we created the view so that we have that the data of the inner sub query/sub queries available always in order to use it in a condition instead of re-evaluating the inner query every time
+--which seems ineffecient.
+
+create materialized view optBoatView as
+select r.sid
+from reserves r where r.bid in(select b.bid from boat b where b.color = 'red');
+
+select distinct s.sname
+from sailors s
+where s.sid in (select sid from optBoatView);
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**(QUERY 9)
+
+--For Q9, we performed inner join instead of the product, as product will result in a bigger number of row, inner join will result in a less number of rows as we will include the rows
+--that satisfy the condition only, and we are also doing the inner join between table "reserves" and table "boat" with only rows that have the color red(we pushed the selection conditions down), thus will results in a less
+--number of rows, and it will enhance the query, last we will have 'exists' and 'exists' performs better than 'in' with queries that return alot of rows.
+
+select s.sname
+from sailors s inner join (reserves r inner join (select * from boat b where color = 'red') as b on r.bid = b.bid) on s.sid = r.sid
+and
+exists ( select r2.sid
+		 from reserves r2 inner join (select * from boat b2 where color = 'green') as b2 on r2.bid = b2.bid
+	   	 where r2.sid = s.sid);
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**(QUERY 10)
+
+--For Q10, we have inner query and it contains "in", this means that it performs the "from" first where it get the first table completely and then in the
+--"where" we pass in every row in the first table and evaluates the inner query every time on each new row of first table until it is exhausted and this is expensive.
+--while in the optimized query the "in" is replaced with an inner join which decreases the number of rows used in outer queries, which subsequently optimize the query cost
+
+
+select *
+from actor
+where act_id in(
+select act_id
+from movie_cast mc inner join movie m on mc.mov_id = m.mov_id
+where m.mov_title ='Annie Hall'); 
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**(QUERY 11)
+
+--For Q11, we have inner query and it contains "in", this means that it performs the "from" first where it get the first table completely and then in the
+--"where" we pass in every row in the first table and evaluates the inner query every time on each new row of first table until it is exhausted and this seems expensive
+--this is why we created views, in the optimized query, so that we have that the data of the inner sub query to use it in a condition instead of re-evaluating the inner query every time.
+
+create materialized view eyesWideShutMovieID as
+select  mov_id 
+from movie 
+where mov_title='Eyes Wide Shut';
+
+create materialized view rolesInEyesWideShut as
+select role 
+from movie_cast 
+where mov_id =ANY (select mov_id from eyesWideShutMovieID);
+
+
+create materialized view moviesCastRoles as
+select mov_id 
+from movie_cast 
+where role =any(select * from rolesInEyesWideShut );
+
+create materialized view movieDirection as
+select dir_id 
+from movie_direction
+where mov_id in(select * from moviesCastRoles);
+
+
+select dir_fname, dir_lname
+from  director
+where dir_id in(select * from movieDirection);
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**(QUERY 12)
+
+--For Q12, we have inner query and it contains "in", this means that it performs the "from" first where it get the first table completely and then in the
+--"where" we pass in every row in the first table and evaluates the inner query every time on each new row of first table until it is exhausted and this is expensive.
+--while in the optimized query the "in" is replaced with an inner join which decreases the number of rows used in outer queries, which subsequently optimize the query cost
+
+select mov_title
+from movie
+where mov_id in (
+select mov_id
+from movie_direction md inner join director d on md.dir_id = d.dir_id
+where dir_fname='Woddy'
+and
+dir_lname='Allen'); 
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+

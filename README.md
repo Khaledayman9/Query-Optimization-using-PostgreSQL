@@ -186,6 +186,7 @@ dir_lname='Allen'));
 
 
 
+
 -For each Query, We used these indices to check whether it will enhance the performances or not:
  
  1- Query without an index.
@@ -199,6 +200,27 @@ dir_lname='Allen'));
  5- Query with mixed indices (any mix of indices).
  
  
+-Some Flags that were used during the optimizing process in was:
+
+1- set enable_seqscan to off;
+
+2- set enable_indexonlyscan to off;
+
+3- set enable_bitmapscan to off;
+
+4- set enable_indexscan to off;
+
+
+
+-We used 2 commands to analyze each Query in terms of cost and performance:
+
+1- explain analyze;
+
+2- explain (FORMAT JSON);
+
+
+-The performance of each Query was related to the execution time and cost of each one, however we prioritized the cost over execution time in our optimization process.
+
  
 # Populating the data of the tables of each Schema:
 -This was done using the Java file/package called MP2DataGenerator and it contains 4 classes, named Schema1, Schema2, Schema3, Schema4 respectively.
